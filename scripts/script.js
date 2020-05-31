@@ -5,17 +5,17 @@
 //  Copyright © 2020 Denis Bystruev. All rights reserved.
 //
 
-// Add animation module for diamong animation
+// Add animation module for diamond animation
 const Animation = require('Animation');
 
 // Add diagnostics module for logging
 const Diagnostics = require('Diagnostics');
 
-// Load the scene
+// Add scene module to manipulate the objects
 const Scene = require('Scene');
 const sceneRoot = Scene.root;
 
-// Get all person objects from the scene
+// Get all character objects from the scene
 // @ts-ignore
 Promise.all([
     // @ts-ignore
@@ -24,28 +24,28 @@ Promise.all([
     sceneRoot.findFirst('origami_diamond')
 ])
     .then(function (searchResult) {
-        // exit if not models found
-        if (searchResult.isEmpty) return;
+        // exit if no models are found
+        if (!searchResult) return;
 
-        // get people in plane tracker
+        // get characters in plane tracker
         const characters = searchResult[0];
 
-        // number of people is number of persons + viewer
+        // number of characters is number of models + viewer
         const numberOfCharacters = characters.length + 1;
 
         // an angle between nearby persons
         const delta = 2 * Math.PI / numberOfCharacters;
 
-        // circle radius is such that there is 0.5 m between nearby persons
+        // circle radius is such that there is 1 m between nearby persons
         const length = 1;
         const radius = length * numberOfCharacters / (2 * Math.PI);
 
         // set models on a circle with radius
         for (let index = 0; index < characters.length; index++) {
-            // get an angle for the next person
+            // get an angle for the next character
             const angle = (index + 1) * delta + Math.PI / 2;
 
-            // get an x, x coordinates for the next person
+            // get an x, z coordinates for the next character
             const x = radius * Math.cos(angle);
             const z = radius * Math.sin(angle);
 
@@ -55,10 +55,10 @@ Promise.all([
             // get the character's transform
             const characterTransform = character.transform;
 
-            // rotate towards the center of a circle
+            // face towards the center of a circle
             characterTransform.rotationY = 3 * Math.PI / 2 - angle;
 
-            // set an x, z coordinates for the next person
+            // place the character on the circle
             characterTransform.x = x;
             characterTransform.z = z - radius;
         }
@@ -76,8 +76,8 @@ Promise.all([
         // start the diamond driver
         diamondDriver.start();
 
-        // create diamond sampler
-        const diamondSampler = Animation.samplers.easeInOutSine(0.25, 0.5);
+        // create diamond sampler for 0.5 m to 1 m
+        const diamondSampler = Animation.samplers.easeInOutSine(0.5, 1);
 
         // create diamond animation
         const diamondAnimation = Animation.animate(diamondDriver, diamondSampler);
@@ -88,6 +88,6 @@ Promise.all([
         // get diamond's transform
         const diamondTransform = diamond.transform;
 
-        // bind the animation
+        // bind the animation to the diamond's height
         diamondTransform.y = diamondAnimation;
     });
