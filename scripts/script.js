@@ -55,6 +55,6 @@ Promise.all([
 
             // set an x, z coordinates for the next person
             characterTransform.x = x;
-            characterTransform.z = z;
+            characterTransform.z = z - radius;
         }
     });
