@@ -5,6 +5,9 @@
 //  Copyright © 2020 Denis Bystruev. All rights reserved.
 //
 
+// Add animation module for diamong animation
+const Animation = require('Animation');
+
 // Add diagnostics module for logging
 const Diagnostics = require('Diagnostics');
 
@@ -16,7 +19,9 @@ const sceneRoot = Scene.root;
 // @ts-ignore
 Promise.all([
     // @ts-ignore
-    sceneRoot.findByPath('**/planeTracker*/characters/*')
+    sceneRoot.findByPath('**/planeTracker*/characters/*'),
+    // @ts-ignore
+    sceneRoot.findFirst('origami_diamond')
 ])
     .then(function (searchResult) {
         // exit if not models found
@@ -57,4 +62,32 @@ Promise.all([
             characterTransform.x = x;
             characterTransform.z = z - radius;
         }
+
+        // setup dimamond animation driver parameters
+        const diamondDriverParameters = {
+            durationMilliseconds: 1000,
+            loopCount: Infinity,
+            mirror: true
+        };
+
+        // setup dimamond animation driver
+        const diamondDriver = Animation.timeDriver(diamondDriverParameters);
+
+        // start the diamond driver
+        diamondDriver.start();
+
+        // create diamond sampler
+        const diamondSampler = Animation.samplers.easeInOutSine(0.25, 0.5);
+
+        // create diamond animation
+        const diamondAnimation = Animation.animate(diamondDriver, diamondSampler);
+
+        // get the object for the diamond
+        const diamond = searchResult[1];
+
+        // get diamond's transform
+        const diamondTransform = diamond.transform;
+
+        // bind the animation
+        diamondTransform.y = diamondAnimation;
     });
