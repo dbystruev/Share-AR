@@ -16,26 +16,27 @@ const sceneRoot = Scene.root;
 // @ts-ignore
 Promise.all([
     // @ts-ignore
-    sceneRoot.findByPath('**/planeTracker*/people/person*')
+    sceneRoot.findByPath('**/planeTracker*/characters/*')
 ])
     .then(function (searchResult) {
         // exit if not models found
         if (searchResult.isEmpty) return;
 
         // get people in plane tracker
-        const people = searchResult[0];
+        const characters = searchResult[0];
 
         // number of people is number of persons + viewer
-        const numberOfPeople = people.length + 1;
+        const numberOfCharacters = characters.length + 1;
 
         // an angle between nearby persons
-        const delta = 2 * Math.PI / numberOfPeople;
+        const delta = 2 * Math.PI / numberOfCharacters;
 
-        // circle radius is such that there is 1 m between nearby persons
-        const radius = numberOfPeople / 2;
+        // circle radius is such that there is 0.5 m between nearby persons
+        const length = 1;
+        const radius = length * numberOfCharacters / (2 * Math.PI);
 
         // set models on a circle with radius
-        for (let index = 0; index < people.length; index++) {
+        for (let index = 0; index < characters.length; index++) {
             // get an angle for the next person
             const angle = (index + 1) * delta + Math.PI / 2;
 
@@ -43,10 +44,17 @@ Promise.all([
             const x = radius * Math.cos(angle);
             const z = radius * Math.sin(angle);
 
+            // get the character
+            const character = characters[index]
+
+            // get the character's transform
+            const characterTransform = character.transform;
+
+            // rotate towards the center of a circle
+            characterTransform.rotationY = 3 * Math.PI / 2 - angle;
+
             // set an x, z coordinates for the next person
-            const personTransform = people[index].transform;
-            personTransform.rotationY =  3 * Math.PI / 2 - angle;
-            personTransform.x = x;
-            personTransform.z = z - radius;
+            characterTransform.x = x;
+            characterTransform.z = z;
         }
     });
